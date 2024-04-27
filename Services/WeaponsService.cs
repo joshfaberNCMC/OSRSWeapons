@@ -9,11 +9,13 @@ namespace OSRSWeapons.Services {
 
         private readonly IWeaponsRepository _weaponsRepository;
 
-        public WeaponsService(IWeaponsRepository weaponsRepository) {
+        public WeaponsService(IWeaponsRepository weaponsRepository) 
+        {
             this._weaponsRepository = weaponsRepository;
         }
 
-        public List<Weapon> GetWeapons(string? criteria) {
+        public List<Weapon> GetWeapons(string? criteria) 
+        {
             List<Weapon> weapons = [];
 
             if (criteria != null) 
@@ -33,7 +35,8 @@ namespace OSRSWeapons.Services {
             return weapons;
         }
 
-        public Weapon? GetWeaponByWeaponId(int weaponId) {
+        public Weapon? GetWeaponByWeaponId(int weaponId) 
+        {
             return this._weaponsRepository.GetWeaponById(weaponId);
         }
 
@@ -64,8 +67,7 @@ namespace OSRSWeapons.Services {
                 request.RangedStrength,
                 request.PrayerBonus,
                 request.Weight,
-                request.ImageUrl,
-                request.Modifiable
+                request.ImageUrl
             );
         }
 
@@ -99,8 +101,7 @@ namespace OSRSWeapons.Services {
                     request.RangedStrength,
                     request.PrayerBonus,
                     request.Weight,
-                    request.ImageUrl,
-                    request.Modifiable);
+                    request.ImageUrl);
             }
 
             catch (Exception ex)
@@ -119,26 +120,11 @@ namespace OSRSWeapons.Services {
 
         public void PatchWeapon(WeaponPatchRequest request, int weaponId) 
         {
-            try
-            {
-                _weaponsRepository.PatchWeapon(weaponId, request);
-            }
-
-            catch (Exception ex)
-            {
-                // If the exception message indicates that the entity is not found
-                if (ex.Message.Contains("not found"))
-                {
-                    throw new EntityNotFoundException($"Update failed as a weapon with ID #{weaponId} does not exist.");
-                }
-                else // Otherwise, throw a WeaponUpdateException
-                {
-                    throw new WeaponUpdateException("Failed to update the weapon.");
-                }
-            }
+            _weaponsRepository.PatchWeapon(weaponId, request);
         }
 
-        public void DeleteWeapon(int weaponId) {
+        public void DeleteWeapon(int weaponId) 
+        {
             this._weaponsRepository.DeleteWeapon(weaponId);
         }
 

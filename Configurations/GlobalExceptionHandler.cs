@@ -26,6 +26,12 @@ namespace OSRSWeapons.Configurations {
                 errorDetails.Message = "Search completed successfully but returned no results.";
                 errorDetails.ExceptionMessage = exception.Message;
             }
+            else if (exception is WeaponUnmodifiableException) 
+            {
+                errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
+                errorDetails.Message = "That item is marked as unmodifiable.";
+                errorDetails.ExceptionMessage = exception.Message;
+            }
             else if (exception is WeaponUpdateException) 
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;

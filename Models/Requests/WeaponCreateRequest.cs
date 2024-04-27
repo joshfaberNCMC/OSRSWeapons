@@ -145,11 +145,5 @@ namespace OSRSWeapons.Models.Requests
         /// </summary>
         [Url]
         public string? ImageUrl { get; set; }
-
-        /// <summary>
-        /// Indicates whether the weapon is modifiable or not
-        /// </summary>
-        [Required]
-        public bool Modifiable { get; set; }
     }
 }

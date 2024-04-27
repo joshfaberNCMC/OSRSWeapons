@@ -81,24 +81,6 @@ namespace OSRSWeapons.Repositories
             return weapon;
         }
 
-        public void DeleteWeapon(int id)
-        {
-            var weapon = _context.Weapons.Find(id);
-            if (weapon != null && weapon.Modifiable == true)
-            {
-                _context.Weapons.Remove(weapon);
-                _context.SaveChanges();
-            }
-            else if (weapon != null && weapon.Modifiable == false)
-            {
-                 throw new Exception($"The weapon with ID {id} could not be modified. You man not change or delete weapons that are marked as unmodifiable.");
-            }
-            else
-            {
-                throw new Exception($"Weapon with ID {id} was not found. Could not delete weapon.");
-            }
-        }
-
         public List<Weapon> GetWeapons()
         {
             return _context.Weapons.ToList();
@@ -106,7 +88,7 @@ namespace OSRSWeapons.Repositories
 
         public List<Weapon> GetWeaponsByCriteria(string criteria)
         {
-            return _context.Weapons
+            return this._context.Weapons
                 .Where(w => w.Name.Contains(criteria) ||
                 w.Examine != null && w.Examine.ToString().Contains(criteria) ||
                 w.PrimaryAttackType.Contains(criteria) || 
@@ -118,7 +100,14 @@ namespace OSRSWeapons.Repositories
 
         public Weapon? GetWeaponById(int id)
         {
-            return _context.Weapons.Find(id);
+            var weapon = this._context.Weapons.Find(id);
+
+            if (weapon == null)
+            {
+                throw new EntityNotFoundException($"Search failed as a weapon with ID #{id} does not exist.");
+            }
+
+            return weapon;
         }
 
         public void UpdateWeapon(
@@ -182,13 +171,18 @@ namespace OSRSWeapons.Repositories
 
                 _context.SaveChanges();
             }
+            if (weapon != null && weapon.Modifiable == true)
+            {
+                _context.Weapons.Remove(weapon);
+                _context.SaveChanges();
+            }
             else if (weapon != null && weapon.Modifiable == false)
             {
-                throw new Exception($"The weapon with ID {id} could not be modified. You man not change or delete weapons that are marked as unmodifiable.");
+                throw new WeaponUnmodifiableException($"The weapon with ID {id} could not be modified. You may not modify weapons that are marked as unmodifiable.");
             }
             else
             {
-                throw new Exception($"Weapon with ID {id} was not found. Could not update weapon.");
+                throw new EntityNotFoundException($"Update failed as a weapon with ID #{id} does not exist.");
             }
         }
 
@@ -197,145 +191,163 @@ namespace OSRSWeapons.Repositories
         {
             // Retrieve the weapon from the database
             var existingWeapon = _context.Weapons.Find(weaponId);
-            Console.WriteLine(existingWeapon);
 
             // If the weapon doesn't exist, throw an exception or handle it appropriately
             if (existingWeapon == null)
             {
                 throw new EntityNotFoundException($"Update failed as a weapon with ID #{weaponId} does not exist.");
             }
-
-            if (request.Name != null)
+            else if (existingWeapon != null && existingWeapon.Modifiable == false)
             {
-                existingWeapon.Name = request.Name;
+                throw new WeaponUnmodifiableException($"The weapon with ID {weaponId} could not be modified. You may not modify weapons that are marked as unmodifiable.");
             }
-
-            if (request.Examine != null)
+            else
             {
-                existingWeapon.Examine = request.Examine;
-            }
+                if (request.Name != null && existingWeapon != null)
+                {
+                    existingWeapon.Name = request.Name;
+                }
 
-            if (request.ExchangePrice != null)
-            {
-                existingWeapon.ExchangePrice = request.ExchangePrice.Value;
-            }
+                if (request.Examine != null && existingWeapon != null)
+                {
+                    existingWeapon.Examine = request.Examine;
+                }
 
-            if (request.HighAlchPrice != null)
-            {
-                existingWeapon.HighAlchPrice = request.HighAlchPrice.Value;
-            }
+                if (request.ExchangePrice != null && existingWeapon != null)
+                {
+                    existingWeapon.ExchangePrice = request.ExchangePrice.Value;
+                }
 
-            if (request.RequiredAttackLvl != null)
-            {
-                existingWeapon.RequiredAttackLvl = request.RequiredAttackLvl.Value;
-            }
+                if (request.HighAlchPrice != null && existingWeapon != null)
+                {
+                    existingWeapon.HighAlchPrice = request.HighAlchPrice.Value;
+                }
 
-            if (request.RequiredStrengthLvl != null)
-            {
-                existingWeapon.RequiredStrengthLvl = request.RequiredStrengthLvl.Value;
-            }
+                if (request.RequiredAttackLvl != null && existingWeapon != null)
+                {
+                    existingWeapon.RequiredAttackLvl = request.RequiredAttackLvl.Value;
+                }
 
-            if (request.PrimaryAttackType != null)
-            {
-                existingWeapon.PrimaryAttackType = request.PrimaryAttackType;
-            }
+                if (request.RequiredStrengthLvl != null && existingWeapon != null)
+                {
+                    existingWeapon.RequiredStrengthLvl = request.RequiredStrengthLvl.Value;
+                }
 
-            if (request.SecondaryAttackType != null)
-            {
-                existingWeapon.SecondaryAttackType = request.SecondaryAttackType;
-            }
+                if (request.PrimaryAttackType != null && existingWeapon != null)
+                {
+                    existingWeapon.PrimaryAttackType = request.PrimaryAttackType;
+                }
 
-            if (request.AttackSpeed != null)
-            {
-                existingWeapon.AttackSpeed = request.AttackSpeed.Value;
-            }
+                if (request.SecondaryAttackType != null && existingWeapon != null)
+                {
+                    existingWeapon.SecondaryAttackType = request.SecondaryAttackType;
+                }
 
-            if (request.AttackStab != null)
-            {
-                existingWeapon.AttackStab = request.AttackStab.Value;
-            }
+                if (request.AttackSpeed != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackSpeed = request.AttackSpeed.Value;
+                }
 
-            if (request.AttackSlash != null)
-            {
-                existingWeapon.AttackSlash = request.AttackSlash.Value;
-            }
+                if (request.AttackStab != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackStab = request.AttackStab.Value;
+                }
 
-            if (request.AttackCrush != null)
-            {
-                existingWeapon.AttackCrush = request.AttackCrush.Value;
-            }
+                if (request.AttackSlash != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackSlash = request.AttackSlash.Value;
+                }
 
-            if (request.AttackMagic != null)
-            {
-                existingWeapon.AttackMagic = request.AttackMagic.Value;
-            }
+                if (request.AttackCrush != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackCrush = request.AttackCrush.Value;
+                }
 
-            if (request.AttackRanged != null)
-            {
-                existingWeapon.AttackRanged = request.AttackRanged.Value;
-            }
+                if (request.AttackMagic != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackMagic = request.AttackMagic.Value;
+                }
 
-            if (request.DefenceStab != null)
-            {
-                existingWeapon.DefenceStab = request.DefenceStab.Value;
-            }
+                if (request.AttackRanged != null && existingWeapon != null)
+                {
+                    existingWeapon.AttackRanged = request.AttackRanged.Value;
+                }
 
-            if (request.DefenceSlash != null)
-            {
-                existingWeapon.DefenceSlash = request.DefenceSlash.Value;
-            }
+                if (request.DefenceStab != null && existingWeapon != null)
+                {
+                    existingWeapon.DefenceStab = request.DefenceStab.Value;
+                }
 
-            if (request.DefenceCrush != null)
-            {
-                existingWeapon.DefenceCrush = request.DefenceCrush.Value;
-            }
+                if (request.DefenceSlash != null && existingWeapon != null)
+                {
+                    existingWeapon.DefenceSlash = request.DefenceSlash.Value;
+                }
 
-            if (request.DefenceMagic != null)
-            {
-                existingWeapon.DefenceMagic = request.DefenceMagic.Value;
-            }
+                if (request.DefenceCrush != null && existingWeapon != null)
+                {
+                    existingWeapon.DefenceCrush = request.DefenceCrush.Value;
+                }
 
-            if (request.DefenceRanged != null)
-            {
-                existingWeapon.DefenceRanged = request.DefenceRanged.Value;
-            }
+                if (request.DefenceMagic != null && existingWeapon != null)
+                {
+                    existingWeapon.DefenceMagic = request.DefenceMagic.Value;
+                }
 
-            if (request.MeleeStrength != null)
-            {
-                existingWeapon.MeleeStrength = request.MeleeStrength.Value;
-            }
+                if (request.DefenceRanged != null && existingWeapon != null)
+                {
+                    existingWeapon.DefenceRanged = request.DefenceRanged.Value;
+                }
 
-            if (request.MagicStrength != null)
-            {
-                existingWeapon.MagicStrength = request.MagicStrength.Value;
-            }
+                if (request.MeleeStrength != null && existingWeapon != null)
+                {
+                    existingWeapon.MeleeStrength = request.MeleeStrength.Value;
+                }
 
-            if (request.RangedStrength != null)
-            {
-                existingWeapon.RangedStrength = request.RangedStrength.Value;
-            }
+                if (request.MagicStrength != null && existingWeapon != null)
+                {
+                    existingWeapon.MagicStrength = request.MagicStrength.Value;
+                }
 
-            if (request.PrayerBonus != null)
-            {
-                existingWeapon.PrayerBonus = request.PrayerBonus.Value;
-            }
+                if (request.RangedStrength != null && existingWeapon != null)
+                {
+                    existingWeapon.RangedStrength = request.RangedStrength.Value;
+                }
 
-            if (request.Weight != null)
-            {
-                existingWeapon.Weight = request.Weight.Value;
-            }
+                if (request.PrayerBonus != null && existingWeapon != null)
+                {
+                    existingWeapon.PrayerBonus = request.PrayerBonus.Value;
+                }
 
-            if (request.ImageUrl != null)
-            {
-                existingWeapon.ImageUrl = request.ImageUrl;
-            }
+                if (request.Weight != null && existingWeapon != null)
+                {
+                    existingWeapon.Weight = request.Weight.Value;
+                }
 
-            if (request.Modifiable != null)
-            {
-                existingWeapon.Modifiable = request.Modifiable.Value;
+                if (request.ImageUrl != null && existingWeapon != null)
+                {
+                    existingWeapon.ImageUrl = request.ImageUrl;
+                }
             }
 
             _context.SaveChanges();
+        }
+        
+        public void DeleteWeapon(int id)
+        {
+            var weapon = _context.Weapons.Find(id);
+            if (weapon != null && weapon.Modifiable == true)
+            {
+                _context.Weapons.Remove(weapon);
+                _context.SaveChanges();
+            }
+            else if (weapon != null && weapon.Modifiable == false)
+            {
+                throw new WeaponUnmodifiableException($"The weapon with ID {id} could not be modified. You may not delete weapons that are marked as unmodifiable.");
+            }
+            else
+            {
+                throw new EntityNotFoundException($"Delete failed as a weapon with ID #{id} does not exist.");
+            }
         }
     }
 }

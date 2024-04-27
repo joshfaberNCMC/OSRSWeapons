@@ -58,7 +58,5 @@ namespace OSRSWeapons.Models.Requests
 
         [Url]
         public string? ImageUrl { get; set; }
-
-        public bool? Modifiable { get; set; }
     }
 }
