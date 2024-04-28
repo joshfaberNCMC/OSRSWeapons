@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace OSRSWeapons.Repositories
 {
+    /// <summary>
+    /// Implementation of the weapons repository interface
+    /// </summary>
+    /// <author>Josh Faber</author>
     public class WeaponsRepositoryImpl : IWeaponsRepository
     {
         private readonly OSRSWeaponsDbContext _context;
@@ -17,6 +21,81 @@ namespace OSRSWeapons.Repositories
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all weapons from the database
+        /// </summary>
+        /// <returns>A list of weapons</returns>
+        public List<Weapon> GetWeapons()
+        {
+            return _context.Weapons.ToList();
+        }
+
+        /// <summary>
+        /// Retrieves weapons from the database based on the provided search criteria
+        /// </summary>
+        /// <param name="criteria">The search criteria</param>
+        /// <returns>A list of weapons matching the criteria</returns>
+        public List<Weapon> GetWeaponsByCriteria(string criteria)
+        {
+            return this._context.Weapons
+                .Where(w => w.Name.Contains(criteria) || // search by name
+                w.Examine != null && w.Examine.ToString().Contains(criteria) || // search by examine text
+                w.PrimaryAttackType.Contains(criteria) || // search by primary attack type
+                w.SecondaryAttackType.Contains(criteria) || // search by secondary attack type
+                w.RequiredAttackLvl.ToString().Contains(criteria) || // search by required attack lvl
+                w.RequiredStrengthLvl.ToString().Contains(criteria) // search by required strength lvl
+                ).ToList();
+        }
+
+        /// <summary>
+        /// Retrieves a weapon from the database based on the weapon ID
+        /// </summary>
+        /// <param name="weaponID">The ID of the weapon to retrieve</param>
+        /// <returns>The weapon with the specified ID, or null if not found</returns>
+        public Weapon? GetWeaponByWeaponID(int weaponID)
+        {
+            var weapon = this._context.Weapons.Find(weaponID);
+
+            if (weapon == null)
+            {
+                throw new EntityNotFoundException($"Search failed as a weapon with ID #{weaponID} does not exist.");
+            }
+            else
+            {
+                return weapon;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new weapon in the database
+        /// </summary>
+        /// <param name="name">The name of the weapon</param>
+        /// <param name="examine">The examine text of the weapon</param>
+        /// <param name="exchangePrice">The exchange price of the weapon</param>
+        /// <param name="highAlchPrice">The high alchemy price of the weapon</param>
+        /// <param name="requiredAttackLvl">The required attack level for using the weapon</param>
+        /// <param name="requiredStrengthLvl">The required strength level for using the weapon</param>
+        /// <param name="primaryAttackType">The primary attack type of the weapon</param>
+        /// <param name="secondaryAttackType">The secondary attack type of the weapon</param>
+        /// <param name="attackSpeed">The attack speed of the weapon</param>
+        /// <param name="attackStab">The stab attack bonus of the weapon</param>
+        /// <param name="attackSlash">The slash attack bonus of the weapon</param>
+        /// <param name="attackCrush">The crush attack bonus of the weapon</param>
+        /// <param name="attackMagic">The magic attack bonus of the weapon</param>
+        /// <param name="attackRanged">The ranged attack bonus of the weapon</param>
+        /// <param name="defenceStab">The stab defence bonus of the weapon</param>
+        /// <param name="defenceSlash">The slash defence bonus of the weapon</param>
+        /// <param name="defenceCrush">The crush defence bonus of the weapon</param>
+        /// <param name="defenceMagic">The magic defence bonus of the weapon</param>
+        /// <param name="defenceRanged">The ranged defence bonus of the weapon</param>
+        /// <param name="meleeStrength">The melee strength bonus of the weapon</param>
+        /// <param name="magicStrength">The magic strength bonus of the weapon</param>
+        /// <param name="rangedStrength">The ranged strength bonus of the weapon</param>
+        /// <param name="prayerBonus">The prayer bonus of the weapon</param>
+        /// <param name="weight">The weight of the weapon</param>
+        /// <param name="imageURL">The URL of the image for the weapon</param>
+        /// <param name="modifiable">Determines if the weapon is modifiable</param>
+        /// <returns>The newly created weapon</returns>
         public Weapon CreateWeapon(
             string name,
             string? examine,
@@ -42,7 +121,7 @@ namespace OSRSWeapons.Repositories
             int rangedStrength,
             int prayerBonus,
             decimal weight,
-            string? imageUrl,
+            string? imageURL,
             bool? modifiable)
         {
             var weapon = new Weapon
@@ -71,7 +150,7 @@ namespace OSRSWeapons.Repositories
                 RangedStrength = rangedStrength,
                 PrayerBonus = prayerBonus,
                 Weight = weight,
-                ImageUrl = imageUrl,
+                ImageURL = imageURL,
                 Modifiable = modifiable
             };
 
@@ -81,37 +160,39 @@ namespace OSRSWeapons.Repositories
             return weapon;
         }
 
-        public List<Weapon> GetWeapons()
-        {
-            return _context.Weapons.ToList();
-        }
 
-        public List<Weapon> GetWeaponsByCriteria(string criteria)
-        {
-            return this._context.Weapons
-                .Where(w => w.Name.Contains(criteria) ||
-                w.Examine != null && w.Examine.ToString().Contains(criteria) ||
-                w.PrimaryAttackType.Contains(criteria) || 
-                w.SecondaryAttackType.Contains(criteria) ||
-                w.RequiredAttackLvl.ToString().Contains(criteria) ||
-                w.RequiredAttackLvl.ToString().Contains(criteria)
-                ).ToList();
-        }
-
-        public Weapon? GetWeaponById(int id)
-        {
-            var weapon = this._context.Weapons.Find(id);
-
-            if (weapon == null)
-            {
-                throw new EntityNotFoundException($"Search failed as a weapon with ID #{id} does not exist.");
-            }
-
-            return weapon;
-        }
-
+        /// <summary>
+        /// Updates an existing weapon in the database
+        /// </summary>
+        /// <param name="weaponID">The ID of the weapon to update</param>
+        /// <param name="name">The new name of the weapon</param>
+        /// <param name="examine">The new examine text of the weapon</param>
+        /// <param name="exchangePrice">The new exchange price of the weapon</param>
+        /// <param name="highAlchPrice">The new high alchemy price of the weapon</param>
+        /// <param name="requiredAttackLvl">The new required attack level for using the weapon</param>
+        /// <param name="requiredStrengthLvl">The new required strength level for using the weapon</param>
+        /// <param name="primaryAttackType">The new primary attack type of the weapon</param>
+        /// <param name="secondaryAttackType">The new secondary attack type of the weapon</param>
+        /// <param name="attackSpeed">The new attack speed of the weapon</param>
+        /// <param name="attackStab">The new stab attack bonus of the weapon</param>
+        /// <param name="attackSlash">The new slash attack bonus of the weapon</param>
+        /// <param name="attackCrush">The new crush attack bonus of the weapon</param>
+        /// <param name="attackMagic">The new magic attack bonus of the weapon</param>
+        /// <param name="attackRanged">The new ranged attack bonus of the weapon</param>
+        /// <param name="defenceStab">The new stab defence bonus of the weapon</param>
+        /// <param name="defenceSlash">The new slash defence bonus of the weapon</param>
+        /// <param name="defenceCrush">The new crush defence bonus of the weapon</param>
+        /// <param name="defenceMagic">The new magic defence bonus of the weapon</param>
+        /// <param name="defenceRanged">The new ranged defence bonus of the weapon</param>
+        /// <param name="meleeStrength">The new melee strength bonus of the weapon</param>
+        /// <param name="magicStrength">The new magic strength bonus of the weapon</param>
+        /// <param name="rangedStrength">The new ranged strength bonus of the weapon</param>
+        /// <param name="prayerBonus">The new prayer bonus of the weapon</param>
+        /// <param name="weight">The new weight of the weapon</param>
+        /// <param name="imageURL">The new URL of the image for the weapon</param>
+        /// <param name="modifiable">Determines if the weapon is modifiable</param>
         public void UpdateWeapon(
-            int id,
+            int weaponID,
             string name,
             string? examine,
             int? exchangePrice,
@@ -136,11 +217,20 @@ namespace OSRSWeapons.Repositories
             int rangedStrength,
             int prayerBonus,
             decimal weight,
-            string? imageUrl,
+            string? imageURL,
             bool? modifiable)
         {
-            var weapon = _context.Weapons.Find(id);
-            if (weapon != null && weapon.Modifiable == true)
+            var weapon = _context.Weapons.Find(weaponID);
+
+            if (weapon == null)
+            {
+                throw new EntityNotFoundException($"Update failed as a weapon with ID #{weaponID} does not exist.");
+            }
+            else if (weapon != null && weapon.Modifiable == false)
+            {
+                throw new WeaponUnmodifiableException($"The weapon with ID #{weaponID} could not be modified. You may not modify weapons that are marked as unmodifiable.");
+            }
+            else if (weapon != null && weapon.Modifiable == true)
             {
                 weapon.Name = name;
                 weapon.Examine = examine;
@@ -166,42 +256,37 @@ namespace OSRSWeapons.Repositories
                 weapon.RangedStrength = rangedStrength;
                 weapon.PrayerBonus = prayerBonus;
                 weapon.Weight = weight;
-                weapon.ImageUrl = imageUrl;
+                weapon.ImageURL = imageURL;
                 weapon.Modifiable = modifiable;
-
-                _context.SaveChanges();
-            }
-            if (weapon != null && weapon.Modifiable == true)
-            {
-                _context.Weapons.Remove(weapon);
-                _context.SaveChanges();
-            }
-            else if (weapon != null && weapon.Modifiable == false)
-            {
-                throw new WeaponUnmodifiableException($"The weapon with ID {id} could not be modified. You may not modify weapons that are marked as unmodifiable.");
             }
             else
             {
-                throw new EntityNotFoundException($"Update failed as a weapon with ID #{id} does not exist.");
+                throw new WeaponUpdateException($"Something went wrong when attempting to update the weapon with ID #{weaponID}.");
             }
+
+            _context.SaveChanges();
         }
 
-        
-        public void PatchWeapon(int weaponId, WeaponPatchRequest request)
+        /// <summary>
+        /// Updates an existing weapon in the database with the provided changes
+        /// </summary>
+        /// <param name="weaponID">The ID of the weapon to update</param>
+        /// <param name="request">The object containing the updated values</param>
+        public void PatchWeapon(int weaponID, WeaponPatchRequest request)
         {
             // Retrieve the weapon from the database
-            var existingWeapon = _context.Weapons.Find(weaponId);
+            var existingWeapon = _context.Weapons.Find(weaponID);
 
             // If the weapon doesn't exist, throw an exception or handle it appropriately
             if (existingWeapon == null)
             {
-                throw new EntityNotFoundException($"Update failed as a weapon with ID #{weaponId} does not exist.");
+                throw new EntityNotFoundException($"Update failed as a weapon with ID #{weaponID} does not exist.");
             }
             else if (existingWeapon != null && existingWeapon.Modifiable == false)
             {
-                throw new WeaponUnmodifiableException($"The weapon with ID {weaponId} could not be modified. You may not modify weapons that are marked as unmodifiable.");
+                throw new WeaponUnmodifiableException($"The weapon with ID #{weaponID} could not be modified. You may not modify weapons that are marked as unmodifiable.");
             }
-            else
+            else if (existingWeapon != null && existingWeapon.Modifiable == true)
             {
                 if (request.Name != null && existingWeapon != null)
                 {
@@ -323,31 +408,48 @@ namespace OSRSWeapons.Repositories
                     existingWeapon.Weight = request.Weight.Value;
                 }
 
-                if (request.ImageUrl != null && existingWeapon != null)
+                if (request.ImageURL != null && existingWeapon != null)
                 {
-                    existingWeapon.ImageUrl = request.ImageUrl;
+                    existingWeapon.ImageURL = request.ImageURL;
                 }
+            }
+            else
+            {
+                throw new WeaponUpdateException($"Something went wrong when attempting to update the weapon with ID #{weaponID}.");
             }
 
             _context.SaveChanges();
         }
         
-        public void DeleteWeapon(int id)
+        /// <summary>
+        /// Deletes a weapon from the database by its ID
+        /// </summary>
+        /// <param name="weaponID">The ID of the weapon to delete</param>
+        /// <exception cref="EntityNotFoundException">Thrown when the weapon with the specified ID does not exist</exception>
+        /// <exception cref="WeaponUnmodifiableException">Thrown when attempting to delete a weapon that is marked as unmodifiable</exception>
+        /// <exception cref="WeaponDeleteException">Thrown when an error occurs during the delete operation</exception>
+        public void DeleteWeapon(int weaponID)
         {
-            var weapon = _context.Weapons.Find(id);
-            if (weapon != null && weapon.Modifiable == true)
+            var weapon = _context.Weapons.Find(weaponID);
+
+            if (weapon == null)
             {
-                _context.Weapons.Remove(weapon);
-                _context.SaveChanges();
+                throw new EntityNotFoundException($"Delete failed as a weapon with ID #{weaponID} does not exist.");
             }
             else if (weapon != null && weapon.Modifiable == false)
             {
-                throw new WeaponUnmodifiableException($"The weapon with ID {id} could not be modified. You may not delete weapons that are marked as unmodifiable.");
+                throw new WeaponUnmodifiableException($"The weapon with ID #{weaponID} could not be modified. You may not delete weapons that are marked as unmodifiable.");
+            }
+            else if (weapon != null && weapon.Modifiable == true)
+            {
+                _context.Weapons.Remove(weapon);
             }
             else
             {
-                throw new EntityNotFoundException($"Delete failed as a weapon with ID #{id} does not exist.");
+                throw new WeaponDeleteException($"Something went wrong when attempting to delete the weapon with ID #{weaponID}.");
             }
+
+            _context.SaveChanges();
         }
     }
 }

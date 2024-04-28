@@ -26,9 +26,9 @@ namespace OSRSWeapons.Repositories {
         /// <summary>
         /// Retrieves a single weapon by its ID (or null if not found)
         /// </summary>
-        /// <param name="id">The ID of the weapon</param>
+        /// <param name="weaponID">The ID of the weapon</param>
         /// <returns>The single weapon with the matching ID, or null</returns>
-        public Weapon? GetWeaponById(int id);
+        public Weapon? GetWeaponByWeaponID(int weaponID);
 
         /// <summary>
         /// Creates a weapon and saves it to the database with the given parameters
@@ -57,7 +57,7 @@ namespace OSRSWeapons.Repositories {
         /// <param name="rangedStrength">The weapon's ranged strength bonus</param>
         /// <param name="prayerBonus">The weapon's prayer bonus</param>
         /// <param name="weight">The weapon's weight</param>
-        /// <param name="imageUrl">The weapon's image URL</param>
+        /// <param name="imageURL">The weapon's image URL</param>
         /// <param name="modifiable">Indicates if the weapon is modifiable</param>
         /// <returns>The created weapon, with its generated ID included</returns>
         public Weapon CreateWeapon(
@@ -85,7 +85,7 @@ namespace OSRSWeapons.Repositories {
             int rangedStrength,
             int prayerBonus,
             decimal weight,
-            string? imageUrl,
+            string? imageURL,
             bool? modifiable = true
         );
 
@@ -93,9 +93,8 @@ namespace OSRSWeapons.Repositories {
         /// Updates a weapon and saves it to the database with the given parameters
         /// All parameters are the same as the previous method
         /// </summary>
-
         public void UpdateWeapon(
-            int id,
+            int weaponID,
             string name,
             string? examine,
             int? exchangePrice,
@@ -120,22 +119,22 @@ namespace OSRSWeapons.Repositories {
             int rangedStrength,
             int prayerBonus,
             decimal weight,
-            string? imageUrl,
+            string? imageURL,
             bool? modifiable = true
         );
 
         /// <summary>
         /// Partially updates a weapon with the given ID using the provided request data
         /// </summary>
-        /// <param name="weaponId">The ID of the weapon to update</param>
+        /// <param name="weaponID">The ID of the weapon to update</param>
         /// <param name="request">The request containing the data to update</param>
-        void PatchWeapon(int weaponId, WeaponPatchRequest request);
+        void PatchWeapon(int weaponID, WeaponPatchRequest request);
 
         /// <summary>
         /// Deletes a weapon from the database with the given ID
         /// </summary>
-        /// <param name="id">The ID of the weapon to delete</param>
-        public void DeleteWeapon(int id);
+        /// <param name="weaponID">The ID of the weapon to delete</param>
+        public void DeleteWeapon(int weaponID);
 
     }
 

@@ -10,6 +10,7 @@ namespace OSRSWeapons.Controllers
     /// <summary>
     /// Controller for managing weapons
     /// </summary>
+    /// <author>Josh Faber</author>
     [ApiController]
     public class WeaponsController : ControllerBase 
     {
@@ -30,28 +31,24 @@ namespace OSRSWeapons.Controllers
         /// <param name="criteria">Optional criteria to filter the list of weapons</param>
         /// <returns>The list of weapons</returns>
         [HttpGet("weapons", Name = "GetWeapons")]
-        public IActionResult GetWeapons([FromQuery] string? criteria) 
+        public List<Weapon> GetWeapons([FromQuery] string? criteria) 
         {
             var weapons = _weaponsService.GetWeapons(criteria);
-            return Ok(weapons);
+            
+            return weapons;
         }
 
         /// <summary>
         /// Retrieves a weapon by its ID
         /// </summary>
-        /// <param name="weaponId">The ID of the weapon</param>
-        /// <returns>The weapon with the specified ID, if found; otherwise, NotFound</returns>
-        [HttpGet("weapons/{weaponId}", Name = "GetWeaponById")]
-        public IActionResult GetWeaponById(int weaponId) 
+        /// <param name="weaponID">The ID of the weapon</param>
+        /// <returns>The weapon with that matching ID</returns>
+        [HttpGet("weapons/{weaponID}", Name = "GetWeaponByWeaponID")]
+        public Weapon? GetWeaponByWeaponID(int weaponID) 
         {
-            var weapon = _weaponsService.GetWeaponByWeaponId(weaponId);
+            var weapon = _weaponsService.GetWeaponByWeaponID(weaponID);
 
-            if (weapon == null) 
-            {
-                return NotFound();
-            }
-
-            return Ok(weapon);
+            return weapon;
         }
 
         /// <summary>
@@ -60,55 +57,44 @@ namespace OSRSWeapons.Controllers
         /// <param name="request">The request containing data for the new weapon</param>
         /// <returns>The created weapon</returns>
         [HttpPost("weapons", Name = "CreateWeapon")]
-        public IActionResult CreateWeapon([FromBody] WeaponCreateRequest request) 
+        public Weapon CreateWeapon([FromBody] WeaponCreateRequest request) 
         {
             var createdWeapon = _weaponsService.CreateWeapon(request);
 
-            return CreatedAtRoute("GetWeaponById", new { weaponId = createdWeapon.WeaponId }, createdWeapon);
+            return createdWeapon;
         }
 
         /// <summary>
         /// Updates an existing weapon
         /// </summary>
-        /// <param name="weaponId">The ID of the weapon to update</param>
+        /// <param name="weaponID">The ID of the weapon to update</param>
         /// <param name="request">The request containing updated data for the weapon</param>
-        /// <returns>NoContent</returns>
-        [HttpPut("weapons/{weaponId}", Name = "UpdateWeapon")]
-        public IActionResult UpdateWeapon(int weaponId, [FromBody] WeaponCreateRequest request) 
+        [HttpPut("weapons/{weaponID}", Name = "UpdateWeapon")]
+        public void UpdateWeapon(int weaponID, [FromBody] WeaponCreateRequest request) 
         {
-            _weaponsService.UpdateWeapon(request, weaponId);
-
-            return NoContent();
+            _weaponsService.UpdateWeapon(request, weaponID);
         }
 
-        [HttpPatch("weapons/{weaponId}", Name = "PatchWeapon")]
-        public IActionResult PatchWeapon(int weaponId, [FromBody] WeaponPatchRequest request) 
+        /// <summary>
+        /// Patches an existing weapon
+        /// </summary>
+        /// <param name="weaponID">The ID of the weapon to patch</param>
+        /// <param name="request">The request containing updated data for the weapon</param>
+        [HttpPatch("weapons/{weaponID}", Name = "PatchWeapon")]
+        public void PatchWeapon(int weaponID, [FromBody] WeaponPatchRequest request) 
         {
-            var existingWeapon = _weaponsService.GetWeaponByWeaponId(weaponId);
-
-            if (existingWeapon == null) 
-            {
-                return NotFound(); // put a custom exception here
-            }
-            else
-            {
-                _weaponsService.PatchWeapon(request, weaponId);
-
-                return NoContent(); // put a custom exception here
-            }
+            _weaponsService.GetWeaponByWeaponID(weaponID);
+            _weaponsService.PatchWeapon(request, weaponID);
         }
 
         /// <summary>
         /// Deletes a weapon
         /// </summary>
-        /// <param name="weaponId">The ID of the weapon to delete</param>
-        /// <returns>NoContent</returns>
-        [HttpDelete("weapons/{weaponId}", Name = "DeleteWeapon")]
-        public IActionResult DeleteWeapon(int weaponId) 
+        /// <param name="weaponID">The ID of the weapon to delete</param>
+        [HttpDelete("weapons/{weaponID}", Name = "DeleteWeapon")]
+        public void DeleteWeapon(int weaponID) 
         {
-            _weaponsService.DeleteWeapon(weaponId);
-            
-            return NoContent();
+            _weaponsService.DeleteWeapon(weaponID);
         }
     }
 }

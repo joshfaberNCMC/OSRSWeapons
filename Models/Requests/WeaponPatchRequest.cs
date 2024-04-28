@@ -2,6 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OSRSWeapons.Models.Requests
 {
+    /// <summary>
+    /// Represents a request object for patching weapon properties
+    /// </summary>
+    /// <author>Josh Faber</author>
     public class WeaponPatchRequest
     {
         [MinLength(3)]
@@ -57,6 +61,6 @@ namespace OSRSWeapons.Models.Requests
         public decimal? Weight { get; set; }
 
         [Url]
-        public string? ImageUrl { get; set; }
+        public string? ImageURL { get; set; }
     }
 }

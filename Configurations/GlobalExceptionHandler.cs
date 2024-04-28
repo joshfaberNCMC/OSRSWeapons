@@ -6,18 +6,28 @@ using Microsoft.AspNetCore.Diagnostics;
 
 namespace OSRSWeapons.Configurations {
 
+    /// <summary>
+    /// Constructor for WeaponsController
+    /// </summary>
+    /// <author>Josh Faber</author>
+    /// <param name="weaponsService">Instance of WeaponsService</param>
     public class GlobalExceptionHandler : IExceptionHandler
     {
+        /// <summary>
+        /// Tries to handle an exception and generate an appropriate error response
+        /// </summary>
+        /// <param name="httpContext">The HttpContext associated with the request</param>
+        /// <param name="exception">The exception that occurred</param>
+        /// <param name="cancellationToken">The cancellation token</param>
+        /// <returns>True if the exception was handled successfully; otherwise, false</returns>
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
-            // Create our ErrorDetails. For now we are just creating a very generic 500 error with a generic message
-            // as an example.
             ErrorDetails errorDetails = new();
 
             if (exception is EntityNotFoundException) 
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.NotFound;
-                errorDetails.Message = "Item could not be found";
+                errorDetails.Message = "Item could not be found.";
                 errorDetails.ExceptionMessage = exception.Message;
             } 
             else if (exception is NoCriteriaMatchException) 
@@ -38,6 +48,12 @@ namespace OSRSWeapons.Configurations {
                 errorDetails.Message = "Weapon failed to update.";
                 errorDetails.ExceptionMessage = exception.Message;
             }
+            else if (exception is WeaponDeleteException) 
+            {
+                errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
+                errorDetails.Message = "Weapon failed to delete.";
+                errorDetails.ExceptionMessage = exception.Message;
+            }
             else if (exception is ValidationException) 
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
@@ -51,16 +67,15 @@ namespace OSRSWeapons.Configurations {
                 errorDetails.ExceptionMessage = exception.Message;
             }
 
-            // Set the status code of the HTTP Response and the Content Type of the HTTP Response.
+            // Set the status code of the HTTP Response and the Content Type of the HTTP Response
             httpContext.Response.StatusCode = errorDetails.StatusCode;
             httpContext.Response.ContentType = "application/json";
             
-            // Write our error details as JSON for the response body.
+            // Write our error details as JSON for the response body
             await httpContext.Response.WriteAsJsonAsync(errorDetails, cancellationToken);
 
-            // Return true as we have successfully handled our exception.
+            // Return true as we have successfully handled our exception
             return true;
         }
     }
-
 }
