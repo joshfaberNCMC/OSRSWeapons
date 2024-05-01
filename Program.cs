@@ -1,18 +1,25 @@
+using Microsoft.EntityFrameworkCore;
 using OSRSWeapons.Configurations;
 using OSRSWeapons.Repositories;
 using OSRSWeapons.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// A dd services to the container.
+// Adds our Controllers to our container and configures our [ApiController] behavior.
+builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+{
+    options.SuppressModelStateInvalidFilter = true;
+});
 
-builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Exception Handler
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+// IConfiguration
+builder.Services.AddSingleton(builder.Configuration);
 
 // Repositories
 builder.Services.AddScoped<OSRSWeaponsDbContext>();

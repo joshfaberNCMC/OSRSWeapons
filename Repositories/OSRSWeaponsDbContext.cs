@@ -11,21 +11,23 @@ namespace OSRSWeapons.Repositories;
 /// <author>Josh Faber</author>
 public partial class OSRSWeaponsDbContext : DbContext
 {
+    private readonly IConfiguration _configuration;
+
     /// <summary>
     /// Initializes a new instance of the OSRSWeaponsDbContext class.
     /// </summary>
-    public OSRSWeaponsDbContext()
+    public OSRSWeaponsDbContext(IConfiguration configuration)
     {
-
+        _configuration = configuration;
     }
 
     /// <summary>
     /// Initializes a new instance of the OSRSWeaponsDbContext class with the specified options
     /// </summary>
     /// <param name="options">The options for configuring the context</param>
-    public OSRSWeaponsDbContext(DbContextOptions<OSRSWeaponsDbContext> options) : base(options)
+    public OSRSWeaponsDbContext(DbContextOptions<OSRSWeaponsDbContext> options, IConfiguration configuration) : base(options)
     {
-
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -38,7 +40,16 @@ public partial class OSRSWeaponsDbContext : DbContext
     /// </summary>
     /// <param name="optionsBuilder">The options builder used to configure the database connection</param>
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Server=localhost;Database=OSRSWeapons;Trusted_Connection=true;TrustServerCertificate=true;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            // Retrieve connection string from IConfiguration
+            var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+            // Set connection string
+            optionsBuilder.UseSqlServer(connectionString);
+        }
+    }
 
     /// <summary>
     /// Configures the schema and behavior of the weapons entity

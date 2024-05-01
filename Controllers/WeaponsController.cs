@@ -32,10 +32,8 @@ namespace OSRSWeapons.Controllers
         /// <returns>The list of weapons</returns>
         [HttpGet("weapons", Name = "GetWeapons")]
         public List<Weapon> GetWeapons([FromQuery] string? criteria) 
-        {
-            var weapons = _weaponsService.GetWeapons(criteria);
-            
-            return weapons;
+        {            
+            return this._weaponsService.GetWeapons(criteria);
         }
 
         /// <summary>
@@ -46,9 +44,7 @@ namespace OSRSWeapons.Controllers
         [HttpGet("weapons/{weaponID}", Name = "GetWeaponByWeaponID")]
         public Weapon? GetWeaponByWeaponID(int weaponID) 
         {
-            var weapon = _weaponsService.GetWeaponByWeaponID(weaponID);
-
-            return weapon;
+            return this._weaponsService.GetWeaponByWeaponID(weaponID);
         }
 
         /// <summary>
@@ -59,9 +55,7 @@ namespace OSRSWeapons.Controllers
         [HttpPost("weapons", Name = "CreateWeapon")]
         public Weapon CreateWeapon([FromBody] WeaponCreateRequest request) 
         {
-            var createdWeapon = _weaponsService.CreateWeapon(request);
-
-            return createdWeapon;
+            return this._weaponsService.CreateWeapon(request);
         }
 
         /// <summary>
@@ -70,9 +64,9 @@ namespace OSRSWeapons.Controllers
         /// <param name="weaponID">The ID of the weapon to update</param>
         /// <param name="request">The request containing updated data for the weapon</param>
         [HttpPut("weapons/{weaponID}", Name = "UpdateWeapon")]
-        public void UpdateWeapon(int weaponID, [FromBody] WeaponCreateRequest request) 
+        public Weapon? UpdateWeapon(int weaponID, [FromBody] WeaponCreateRequest request) 
         {
-            _weaponsService.UpdateWeapon(request, weaponID);
+           return this._weaponsService.UpdateWeapon(request, weaponID);
         }
 
         /// <summary>
@@ -81,10 +75,9 @@ namespace OSRSWeapons.Controllers
         /// <param name="weaponID">The ID of the weapon to patch</param>
         /// <param name="request">The request containing updated data for the weapon</param>
         [HttpPatch("weapons/{weaponID}", Name = "PatchWeapon")]
-        public void PatchWeapon(int weaponID, [FromBody] WeaponPatchRequest request) 
+        public Weapon? PatchWeapon(int weaponID, [FromBody] WeaponPatchRequest request) 
         {
-            _weaponsService.GetWeaponByWeaponID(weaponID);
-            _weaponsService.PatchWeapon(request, weaponID);
+            return this._weaponsService.PatchWeapon(request, weaponID);
         }
 
         /// <summary>
@@ -92,9 +85,9 @@ namespace OSRSWeapons.Controllers
         /// </summary>
         /// <param name="weaponID">The ID of the weapon to delete</param>
         [HttpDelete("weapons/{weaponID}", Name = "DeleteWeapon")]
-        public void DeleteWeapon(int weaponID) 
+        public string DeleteWeapon(int weaponID) 
         {
-            _weaponsService.DeleteWeapon(weaponID);
+            return this._weaponsService.DeleteWeapon(weaponID);
         }
     }
 }

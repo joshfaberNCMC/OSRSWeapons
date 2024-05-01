@@ -62,7 +62,7 @@ namespace OSRSWeapons.Repositories {
         /// <returns>The created weapon, with its generated ID included</returns>
         public Weapon CreateWeapon(
             string name, 
-            string? examine,
+            string examine,
             int? exchangePrice,
             int? highAlchPrice,
             int requiredAttackLvl,
@@ -93,10 +93,10 @@ namespace OSRSWeapons.Repositories {
         /// Updates a weapon and saves it to the database with the given parameters
         /// All parameters are the same as the previous method
         /// </summary>
-        public void UpdateWeapon(
+        public Weapon? UpdateWeapon(
             int weaponID,
             string name,
-            string? examine,
+            string examine,
             int? exchangePrice,
             int? highAlchPrice,
             int requiredAttackLvl,
@@ -128,13 +128,13 @@ namespace OSRSWeapons.Repositories {
         /// </summary>
         /// <param name="weaponID">The ID of the weapon to update</param>
         /// <param name="request">The request containing the data to update</param>
-        void PatchWeapon(int weaponID, WeaponPatchRequest request);
+        Weapon? PatchWeapon(int weaponID, WeaponPatchRequest request);
 
         /// <summary>
         /// Deletes a weapon from the database with the given ID
         /// </summary>
         /// <param name="weaponID">The ID of the weapon to delete</param>
-        public void DeleteWeapon(int weaponID);
+        public string DeleteWeapon(int weaponID);
 
     }
 

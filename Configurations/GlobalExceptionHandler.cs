@@ -30,6 +30,12 @@ namespace OSRSWeapons.Configurations {
                 errorDetails.Message = "Item could not be found.";
                 errorDetails.ExceptionMessage = exception.Message;
             } 
+            else if (exception is DbOperationException) 
+            {
+                errorDetails.StatusCode = (int) HttpStatusCode.InternalServerError;
+                errorDetails.Message = "Database operation has failed.";
+                errorDetails.ExceptionMessage = exception.Message;
+            }
             else if (exception is NoCriteriaMatchException) 
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.Accepted;
@@ -40,6 +46,12 @@ namespace OSRSWeapons.Configurations {
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
                 errorDetails.Message = "That item is marked as unmodifiable.";
+                errorDetails.ExceptionMessage = exception.Message;
+            }
+            else if (exception is WeaponCreateException) 
+            {
+                errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
+                errorDetails.Message = "Weapon failed to be.";
                 errorDetails.ExceptionMessage = exception.Message;
             }
             else if (exception is WeaponUpdateException) 

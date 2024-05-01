@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using OSRSWeapons.Models;
 using OSRSWeapons.Models.Requests;
 using OSRSWeapons.Repositories;
@@ -100,9 +101,9 @@ namespace OSRSWeapons.Services
         /// </summary>
         /// <param name="request">The request containing updated information about the weapon</param>
         /// <param name="weaponID">The ID of the weapon to be updated</param>
-        public void UpdateWeapon(WeaponCreateRequest request, int weaponID) 
+        public Weapon? UpdateWeapon(WeaponCreateRequest request, int weaponID) 
         {
-            _weaponsRepository.UpdateWeapon(
+            return this._weaponsRepository.UpdateWeapon(
                 weaponID,
                 request.Name,
                 request.Examine,
@@ -136,18 +137,18 @@ namespace OSRSWeapons.Services
         /// </summary>
         /// <param name="request">The patch request containing partial updates for the weapon</param>
         /// <param name="weaponID">The ID of the weapon to be patched</param>
-        public void PatchWeapon(WeaponPatchRequest request, int weaponID) 
+        public Weapon? PatchWeapon(WeaponPatchRequest request, int weaponID) 
         {
-            _weaponsRepository.PatchWeapon(weaponID, request);
+            return this._weaponsRepository.PatchWeapon(weaponID, request);
         }
 
         /// <summary>
         /// Deletes a weapon from the repository by its ID
         /// </summary>
         /// <param name="weaponID">The ID of the weapon to be deleted</param>
-        public void DeleteWeapon(int weaponID) 
+        public string DeleteWeapon(int weaponID) 
         {
-            this._weaponsRepository.DeleteWeapon(weaponID);
+            return this._weaponsRepository.DeleteWeapon(weaponID);
         }
 
     }
