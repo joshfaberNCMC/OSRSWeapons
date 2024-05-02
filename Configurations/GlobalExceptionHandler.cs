@@ -51,7 +51,7 @@ namespace OSRSWeapons.Configurations {
             else if (exception is WeaponCreateException) 
             {
                 errorDetails.StatusCode = (int) HttpStatusCode.BadRequest;
-                errorDetails.Message = "Weapon failed to be.";
+                errorDetails.Message = "Weapon failed to be created.";
                 errorDetails.ExceptionMessage = exception.Message;
             }
             else if (exception is WeaponUpdateException) 

@@ -69,7 +69,8 @@ namespace OSRSWeapons.Repositories
         /// <param name="weaponID">The ID of the weapon to retrieve</param>
         /// <returns>The weapon with the specified ID, or null if not found</returns>
         public Weapon? GetWeaponByWeaponID(int weaponID)
-        {   try
+        {   
+            try
             {
                 var weapon = this._context.Weapons.Find(weaponID);
 
